@@ -1,5 +1,8 @@
 package info.jiuyou.codediy_sdk.api.base.event
 
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
+
 /**
  * ==========================================
  * <p>
@@ -18,20 +21,39 @@ package info.jiuyou.codediy_sdk.api.base.event
  * ==========================================
  */
 open class BaseEvent<T>(val uuid: String, var code: Int = -1, var data: T? = null) {
-    protected var ok: Boolean = false
+
+    val codeDes by CodeDesDelegate(code)
+    fun isOk() = data != null
+    fun exist(block: BaseEvent<T>.() -> Unit) {
+        if (isOk()) {
+            block(this)
+        }
+    }
+
+}
+
+class CodeDesDelegate(val code: Int) : ReadOnlyProperty<Any?, String> {
+
+    val codeString = mutableMapOf<Int, String?>()
 
     init {
-        ok = data != null
+        codeString[-1] = "可能是网络未连接"
+        codeString[200] = "请求成功，或执行成功。"
+        codeString[201] = codeString[200]
+        codeString[400] = "参数不符合 API 的要求、或者数据格式验证没有通过"
+        codeString[401] = "用户认证失败，或缺少认证信息，比如 access_token 过期，或没传，可以尝试用 refresh_token 方式获得新的 access_token"
+        codeString[402] = "用户尚未登录"
+        codeString[403] = "当前用户对资源没有操作权限"
+        codeString[404] = "资源不存在"
+        codeString[500] = "服务器异常"
     }
 
-    fun setEvent(code: Int, data: T): BaseEvent<T> {
-        ok = true
-        this.code = code
-        this.data = data
-        return this
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>): String {
+        return if (codeString[code] != null) codeString[code]!! else "未知异常($code)"
     }
+
 }
 
-fun main(args: Array<String>) {
-    val b = BaseEvent<String>("")
-}
+
+
