@@ -12,29 +12,9 @@ import org.jetbrains.anko.info
 
 
 class MainActivity : AppCompatActivity(), AnkoLogger {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        EventBus.getDefault().register(this)
-        val uuid = LoginImpl(this@MainActivity).updateDevices()
-        info("uuid:$uuid")
-
     }
 
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onEvent(event: UpdateDevicesEvent) {
-        info(event.uuid)
-        info(event.codeDes())
-        event.exist {
-            info(data)
-        }
-    }
-
-
-    override fun onDestroy() {
-        EventBus.getDefault().unregister(this)
-        super.onDestroy()
-    }
 }
