@@ -1,1 +1,1 @@
-include ':app', ':codediy-sdk'
+include ':app','sdk'
