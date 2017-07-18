@@ -5,8 +5,6 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import info.jiuyou.codediy_sdk.api.base.event.BaseEvent;
-
 /**
  * Instrumentation test, which will execute on an Android device.
  *

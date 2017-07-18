@@ -1,7 +1,4 @@
-package info.jiuyou.codediy_sdk.api.base.event
-
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
+package info.jiuyou.codediy_sdk.api.base
 
 /**
  * ==========================================
@@ -20,24 +17,12 @@ import kotlin.reflect.KProperty
  * </p>
  * ==========================================
  */
-open class BaseEvent<T>(val uuid: String, var code: Int = -1, var data: T? = null) {
-
-    val codeDes by CodeDesDelegate(code)
-    fun isOk() = data != null
-    fun exist(block: BaseEvent<T>.() -> Unit) {
-        if (isOk()) {
-            block(this)
-        }
-    }
-
-}
-
-class CodeDesDelegate(val code: Int) : ReadOnlyProperty<Any?, String> {
-
-    val codeString = mutableMapOf<Int, String?>()
+open class BaseEvent<T>(open val uuid: String,open var code: Int = -1,open var data: T? = null) {
+    private val codeString = mutableMapOf<Int, String?>()
 
     init {
         codeString[-1] = "可能是网络未连接"
+        codeString[0] = "用户登出"
         codeString[200] = "请求成功，或执行成功。"
         codeString[201] = codeString[200]
         codeString[400] = "参数不符合 API 的要求、或者数据格式验证没有通过"
@@ -48,12 +33,19 @@ class CodeDesDelegate(val code: Int) : ReadOnlyProperty<Any?, String> {
         codeString[500] = "服务器异常"
     }
 
-
-    override fun getValue(thisRef: Any?, property: KProperty<*>): String {
-        return if (codeString[code] != null) codeString[code]!! else "未知异常($code)"
+    fun isOk() = data != null
+    fun exist(block: BaseEvent<T>.() -> Unit): BaseEvent<T> {
+        if (isOk()) {
+            block(this)
+        }
+        return this
     }
 
+    fun codeDes(): String = if (codeString[code] != null) codeString[code]!! else "未知异常($code)"
+
 }
+
+
 
 
 
