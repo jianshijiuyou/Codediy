@@ -28,8 +28,13 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.anko:anko:$anko_version"
-    compile project(':sdk')
+    compile project(':diycode-sdk')
     compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.android.support:design:25.3.1'
+
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
 }
 kotlin {
     experimental {

@@ -23,18 +23,13 @@ import java.io.Serializable
  * ==========================================
  */
 class Config private constructor(context: Context) {
+    val mDiskCache = ACache.get(context, "config")!!
 
-    init {
-        mDiskCache = ACache.get(context, "config")
-    }
 
     companion object {
         val M = 1024 * 1024
-        lateinit var mConfig: Config
+        var mConfig: Config? = null
         val mLruCache = LruCache<String, Any>(1 * M)
-        lateinit var mDiskCache: ACache
-
-
         val Key_Browser = "UseInsideBrowser_"
         val Key_MainViewPager_Position = "Key_MainViewPager_Position"
         val Key_TopicList_LastPosition = "Key_TopicList_LastPosition"
@@ -53,7 +48,7 @@ class Config private constructor(context: Context) {
                     }
                 }
             }
-            return mConfig
+            return mConfig!!
         }
 
         fun instance() = mConfig
