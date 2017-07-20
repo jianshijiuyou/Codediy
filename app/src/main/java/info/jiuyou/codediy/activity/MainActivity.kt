@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import info.jiuyou.codediy.R
 import info.jiuyou.codediy.base.app.BaseActivity
 import info.jiuyou.codediy.fragment.base.RefreshRecyclerFragment
+import info.jiuyou.codediy.fragment.base.SimpleRefreshRecyclerFragment
 import info.jiuyou.codediy.utils.Config
 import info.jiuyou.codediy.utils.DataCache
 import kotlinx.android.synthetic.main.activity_main.*
@@ -45,9 +46,9 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
     fun initViewPager() {
         viewPager.offscreenPageLimit = 3
 
-        val fragment1 = RefreshRecyclerFragment.newInstance()
-        val fragment2 = RefreshRecyclerFragment.newInstance()
-        val fragment3 = RefreshRecyclerFragment.newInstance()
+        val fragment1 = SimpleRefreshRecyclerFragment()
+        val fragment2 = SimpleRefreshRecyclerFragment()
+        val fragment3 = SimpleRefreshRecyclerFragment()
         viewPager.adapter = object : FragmentPagerAdapter(supportFragmentManager) {
             val titles = arrayOf("Topics", "News", "Sites")
             override fun getItem(position: Int) = when (position) {
