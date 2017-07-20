@@ -6,4 +6,6 @@
     <color name="app_nav_head_start">#1DDCF3</color>
     <color name="app_nav_head_end">#419396</color>
     <color name="app_text_main">#fff</color>
+    <color name="app_text_main_sub">#333</color>
+    <color name="tab_indicator_color">#999</color>
 </resources>

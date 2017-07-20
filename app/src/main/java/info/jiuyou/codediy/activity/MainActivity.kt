@@ -1,17 +1,24 @@
 package info.jiuyou.codediy.activity
 
 import android.support.design.widget.NavigationView
+import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.GravityCompat
+import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.view.GestureDetector
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
-import android.widget.ArrayAdapter
 import info.jiuyou.codediy.R
 import info.jiuyou.codediy.base.app.BaseActivity
+import info.jiuyou.codediy.fragment.base.RefreshRecyclerFragment
+import info.jiuyou.codediy.utils.Config
+import info.jiuyou.codediy.utils.DataCache
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_main.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.toast
@@ -20,20 +27,54 @@ import org.jetbrains.anko.toast
 class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItemSelectedListener {
 
     private var isToolbarFirstClick = true
-
-
+    private lateinit var mCache: DataCache
+    private val mConfig = Config.instance()
+    private var mCurrentPosition = 0
     override fun getLayoutId() = R.layout.activity_main
 
-    override fun initData() {
-
-    }
 
     override fun initViews() {
+        EventBus.getDefault().register(this)
+
+        mCache = DataCache(this)
 
         initMenu()
+        initViewPager()
+    }
 
-//        val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayOf("item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item"))
-//        listView.adapter = adapter
+    fun initViewPager() {
+        viewPager.offscreenPageLimit = 3
+
+        val fragment1 = RefreshRecyclerFragment.newInstance()
+        val fragment2 = RefreshRecyclerFragment.newInstance()
+        val fragment3 = RefreshRecyclerFragment.newInstance()
+        viewPager.adapter = object : FragmentPagerAdapter(supportFragmentManager) {
+            val titles = arrayOf("Topics", "News", "Sites")
+            override fun getItem(position: Int) = when (position) {
+                0 -> fragment1
+                1 -> fragment2
+                2 -> fragment3
+                else -> {
+                    throw NullPointerException("没有找到对应的fragment")
+                }
+            }
+
+            override fun getCount() = 3
+
+            override fun getPageTitle(position: Int): CharSequence {
+                return titles[position]
+            }
+        }
+
+        viewPager.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
+            override fun onPageSelected(position: Int) {
+                mCurrentPosition = position
+            }
+        })
+
+        mCurrentPosition = mConfig?.getMainViewPagerPosition() ?: 0
+        viewPager.currentItem = mCurrentPosition
+        tabLayout.setupWithViewPager(viewPager)
 
     }
 
@@ -88,6 +129,13 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
         toast("返回顶部")
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onTest(s: String) {
+
+    }
+
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
@@ -118,12 +166,17 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
         when (item?.itemId) {
             R.id.action_notification -> {
                 toast("通知")
+                return true
             }
             R.id.action_settings -> {
                 toast("设置")
+                return true
+            }
+            else -> {
+                return super.onOptionsItemSelected(item)
             }
         }
-        return true
+
     }
 
     override fun onBackPressed() {
@@ -134,4 +187,9 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
         }
     }
 
+    override fun onDestroy() {
+        EventBus.getDefault().unregister(this)
+        mConfig?.saveMainViewPagerPosition(mCurrentPosition)
+        super.onDestroy()
+    }
 }

@@ -6,7 +6,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "info.jiuyou.codediy"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -26,11 +26,19 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:customtabs:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.anko:anko:$anko_version"
-    compile project(':diycode-sdk')
+
     compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.android.support:design:25.3.1'
+    compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.2-alpha-8'
+    compile 'me.drakeet.multitype:multitype:3.1.0'
+
+    compile project(':diycode-sdk')
+
 
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'

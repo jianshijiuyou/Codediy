@@ -61,13 +61,13 @@ class Config private constructor(context: Context) {
     }
 
     fun <T : Serializable> getData(key: String, def: T): T {
-        var value = mLruCache[key] as T
+        var value = mLruCache[key]
         if (value != null) {
-            return value
+            return value as T
         }
-        value = mDiskCache.getAsObject(key) as T
+        value = mDiskCache.getAsObject(key)
         if (value != null) {
-            return value
+            return value as T
         }
         return def
     }

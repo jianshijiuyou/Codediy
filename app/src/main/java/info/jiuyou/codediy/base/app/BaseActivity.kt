@@ -55,6 +55,6 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
 
-    abstract fun initData()
+    protected open fun initData() {}
     abstract fun initViews()
 }
