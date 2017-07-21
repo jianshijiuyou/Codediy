@@ -320,6 +320,7 @@ public class ACache {
      * @param key
      * @return byte 数据
      */
+
     public byte[] getAsBinary(String key) {
         RandomAccessFile RAFile = null;
         boolean removeFile = false;

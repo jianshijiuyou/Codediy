@@ -9,6 +9,7 @@ import me.drakeet.multitype.MultiTypeAdapter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.jetbrains.anko.support.v4.toast
 
 
 /**
@@ -16,7 +17,7 @@ import org.greenrobot.eventbus.ThreadMode
  * create date ：2017/7/20 0020  14:43
  * des ：
  */
-abstract class RefreshRecyclerFragment<T, in Event : BaseEvent<List<T>>> : BaseFragment() {
+abstract class RefreshRecyclerFragment<T, Event : BaseEvent<List<T>>> : BaseFragment() {
 
     companion object {
         val POST_TYPE_REFRESH = "post_type_refresh"
@@ -26,8 +27,8 @@ abstract class RefreshRecyclerFragment<T, in Event : BaseEvent<List<T>>> : BaseF
     private val mPostTypes = mutableMapOf<String, String>()
 
 
-    private lateinit var adapter: MultiTypeAdapter
-    private var pageIndex = 0
+    protected lateinit var adapter: MultiTypeAdapter
+    protected var pageIndex = 0
     private var pageCount = 20
 
 
@@ -48,7 +49,7 @@ abstract class RefreshRecyclerFragment<T, in Event : BaseEvent<List<T>>> : BaseF
     }
 
     private fun refresh() {
-        val uuid = request(pageIndex * pageCount, pageCount)
+        val uuid = request(0, pageCount)
         mPostTypes[uuid] = POST_TYPE_REFRESH
     }
 
@@ -104,16 +105,29 @@ abstract class RefreshRecyclerFragment<T, in Event : BaseEvent<List<T>>> : BaseF
     }
 
     fun quickToTop() {
-        recyclerView.smoothScrollToPosition(0)
+        recyclerView.scrollToPosition(0)
     }
 
+    protected open fun onRefresh(adapter: MultiTypeAdapter, event: Event) {
+        adapter.setDatas(event.bean)
+    }
+
+    protected open fun onLoadMore(adapter: MultiTypeAdapter, event: Event) {
+        adapter.addDatas(event.bean)
+    }
+
+    protected open fun onError(event: Event, type: String) {
+        when (type) {
+            POST_TYPE_REFRESH -> {
+                toast("刷新数据失败")
+            }
+            POST_TYPE_LOADMORE -> {
+                toast("加载数据失败")
+            }
+        }
+    }
     //==================================
 
-    abstract fun onRefresh(adapter: MultiTypeAdapter, event: Event)
-    abstract fun onLoadMore(adapter: MultiTypeAdapter, event: Event)
-
-
-    abstract fun noMore()
 
     /**
      * 类型注册
@@ -132,5 +146,5 @@ abstract class RefreshRecyclerFragment<T, in Event : BaseEvent<List<T>>> : BaseF
 
     abstract fun request(offset: Int, limit: Int): String
 
-    abstract fun onError(event: Event, type: String)
+
 }
