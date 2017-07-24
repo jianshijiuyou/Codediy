@@ -3,9 +3,10 @@ package info.jiuyou.codediy.fragment
 import android.support.v7.widget.GridLayoutManager
 import com.gcssloop.diycode_sdk.api.sites.bean.Sites
 import com.gcssloop.diycode_sdk.api.sites.event.GetSitesEvent
+import info.jiuyou.codediy.R
 import info.jiuyou.codediy.fragment.base.RefreshRecyclerFragment
-import info.jiuyou.codediy.fragment.viewbinder.SiteViewBinder
-import info.jiuyou.codediy.fragment.viewbinder.SitesViewBinder
+import info.jiuyou.codediy.viewbinder.SiteViewBinder
+import info.jiuyou.codediy.viewbinder.SitesViewBinder
 import kotlinx.android.synthetic.main.fragment_main_base.*
 import me.drakeet.multitype.MultiTypeAdapter
 import java.io.Serializable
@@ -25,7 +26,7 @@ class SitesListFragment : RefreshRecyclerFragment<Sites, GetSitesEvent>() {
         val manager = GridLayoutManager(activity, 2)
         manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return 1
+                return if (adapter.items[position] is Sites) 2 else 1
             }
         }
         return manager
@@ -33,8 +34,8 @@ class SitesListFragment : RefreshRecyclerFragment<Sites, GetSitesEvent>() {
 
     override fun initData(adapter: MultiTypeAdapter) {
 
-        refreshLayout.isLoadmoreFinished = true
-
+        refreshLayout.isEnableLoadmore = false
+        recyclerView.setBackgroundResource(R.color.app_bg)
         val list = mDataCache.getSitesItems<Serializable>()
         if (list == null || list.size <= 0) {
             refreshLayout.autoRefresh()
@@ -50,7 +51,13 @@ class SitesListFragment : RefreshRecyclerFragment<Sites, GetSitesEvent>() {
     }
 
     override fun onLoadMore(adapter: MultiTypeAdapter, event: GetSitesEvent) {
-        val list = event.bean.flatMap { it.sites }
+
+        val list = event.bean.flatMap {
+            val l = mutableListOf<Any>()
+            l.add(it)
+            l.addAll(it.sites)
+            l
+        }
         adapter.setDatas(list)
         mDataCache.saveSitesItems(list)
     }

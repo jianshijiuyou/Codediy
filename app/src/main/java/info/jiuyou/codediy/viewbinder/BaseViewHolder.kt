@@ -1,4 +1,4 @@
-package info.jiuyou.codediy.fragment.viewbinder
+package info.jiuyou.codediy.viewbinder
 
 import android.support.v7.widget.RecyclerView
 import android.util.SparseArray

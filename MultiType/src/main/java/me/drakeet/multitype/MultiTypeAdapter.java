@@ -179,7 +179,10 @@ public class MultiTypeAdapter extends RecyclerView.Adapter<ViewHolder> {
         this.items.addAll(items);
         notifyItemRangeInserted(this.items.size(),items.size());
     }
-
+    public void addData(Object items) {
+        this.items.add(items);
+        notifyItemInserted(this.items.size());
+    }
 
     @NonNull
     public List<?> getItems() {

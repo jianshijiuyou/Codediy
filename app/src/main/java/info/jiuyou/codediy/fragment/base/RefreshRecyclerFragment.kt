@@ -105,7 +105,7 @@ abstract class RefreshRecyclerFragment<T, Event : BaseEvent<List<T>>> : BaseFrag
     }
 
     fun quickToTop() {
-        recyclerView.scrollToPosition(0)
+        recyclerView.smoothScrollToPosition(0)
     }
 
     protected open fun onRefresh(adapter: MultiTypeAdapter, event: Event) {

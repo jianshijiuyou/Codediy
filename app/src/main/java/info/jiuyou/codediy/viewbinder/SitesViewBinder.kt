@@ -1,4 +1,4 @@
-package info.jiuyou.codediy.fragment.viewbinder
+package info.jiuyou.codediy.viewbinder
 
 import android.content.Context
 import android.view.LayoutInflater

@@ -1,15 +1,19 @@
-package info.jiuyou.codediy.fragment.viewbinder
+package info.jiuyou.codediy.viewbinder
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.gcssloop.diycode_sdk.api.news.bean.New
 import info.jiuyou.codediy.R
+import info.jiuyou.codediy.utils.CustomTabsHelper
 import info.jiuyou.codediy.utils.ImageUtils
 import info.jiuyou.codediy.utils.TimeUtil
 import me.drakeet.multitype.ItemViewBinder
+import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.toast
 
 /**
  * author ：jianshijiuyou@gmail.com
@@ -28,5 +32,16 @@ class NewsViewBinder(val ctx: Context) : ItemViewBinder<New, BaseViewHolder>() {
         holder.getView<TextView>(R.id.tv_time).text = TimeUtil.computePastTime(item.updated_at)
         holder.getView<TextView>(R.id.tv_title).text = item.title
         holder.getView<TextView>(R.id.tv_subtitle).text = item.address
+
+        holder.getView<TextView>(R.id.tv_name).onClick {
+            ctx.toast(item.user.name)
+        }
+        holder.getView<ImageView>(R.id.img_head).onClick {
+            ctx.toast(item.user.name)
+        }
+        holder.getView<View>(R.id.item).onClick {
+            CustomTabsHelper.openUrl(ctx,item.address)
+        }
+
     }
 }

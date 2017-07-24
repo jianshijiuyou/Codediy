@@ -56,12 +56,12 @@ public class DataCache {
     public <T extends Serializable> void saveListData(String key, List<T> data) {
         ArrayList<T> datas = (ArrayList<T>) data;
         mLruCache.put(key, datas);
-        mDiskCache.put(key, datas, ACache.TIME_WEEK);     // 数据缓存时间为 1 周
+        mDiskCache.put(key, datas, ACache.TIME_DAY);     // 数据缓存时间为 1 day
     }
 
     public <T extends Serializable> void saveData(@NonNull String key, @NonNull T data) {
         mLruCache.put(key, data);
-        mDiskCache.put(key, data, ACache.TIME_WEEK);     // 数据缓存时间为 1 周
+        mDiskCache.put(key, data, ACache.TIME_DAY);     // 数据缓存时间为 1 day
     }
 
     public <T extends Serializable> T getData(@NonNull String key) {
@@ -115,14 +115,14 @@ public class DataCache {
         return getData("topic_list_obj_");
     }
 
-    public void saveNewsList(List<New> newList) {
-        ArrayList<New> news = new ArrayList<>(newList);
-        saveData("news_list_", news);
-    }
-
-    public List<New> getNewsList() {
-        return getData("news_list_");
-    }
+//    public void saveNewsList(List<New> newList) {
+//        ArrayList<New> news = new ArrayList<>(newList);
+//        saveData("news_list_", news);
+//    }
+//
+//    public List<New> getNewsList() {
+//        return getData("news_list_");
+//    }
 
     public void saveNewsListObj(List<Object> newList) {
         ArrayList<Object> news = new ArrayList<>(newList);
@@ -145,16 +145,16 @@ public class DataCache {
         removeDate("Gcs_Me_");
     }
 
-    public void saveSites(List<Sites> sitesList) {
-        saveListData("sites_", sitesList);
-    }
+//    public void saveSites(List<Sites> sitesList) {
+//        saveListData("sites_", sitesList);
+//    }
+//
+//    public List<Sites> getSites() {
+//        return getData("sites_");
+//    }
 
-    public List<Sites> getSites() {
-        return getData("sites_");
-    }
-
-    public <T extends Serializable> void saveSitesItems(List<T> sitesList) {
-        saveListData("sites_item_", sitesList);
+    public <T> void saveSitesItems(List<T> sitesList) {
+        saveListData("sites_item_", (List<Serializable>)sitesList);
     }
 
     public <T extends Serializable> ArrayList<T> getSitesItems() {

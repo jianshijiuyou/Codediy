@@ -24,7 +24,7 @@ class ViewHolder(layoutInflater: LayoutInflater, viewParent: ViewGroup?, layoutR
         var view = views[id]
         if (view == null) {
             view = rootView.findViewById(id)
-            views[id] = view
+            views.put(id,view)
         }
         return view
     }

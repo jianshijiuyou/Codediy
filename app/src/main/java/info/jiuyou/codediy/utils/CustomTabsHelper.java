@@ -35,7 +35,7 @@ public class CustomTabsHelper {
 
     public static void openUrl(Context context, String url) {
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-        builder.setToolbarColor(Color.WHITE);
+        builder.setToolbarColor(context.getResources().getColor(R.color.colorPrimary));
         builder.setShowTitle(true);
         builder.setCloseButtonIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable
                 .ic_arrow_back_black_24dp));

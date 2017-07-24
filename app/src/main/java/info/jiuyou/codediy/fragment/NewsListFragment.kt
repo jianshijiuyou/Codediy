@@ -4,7 +4,7 @@ import android.support.v7.widget.LinearLayoutManager
 import com.gcssloop.diycode_sdk.api.news.bean.New
 import com.gcssloop.diycode_sdk.api.news.event.GetNewsListEvent
 import info.jiuyou.codediy.fragment.base.RefreshRecyclerFragment
-import info.jiuyou.codediy.fragment.viewbinder.NewsViewBinder
+import info.jiuyou.codediy.viewbinder.NewsViewBinder
 import kotlinx.android.synthetic.main.fragment_main_base.*
 import me.drakeet.multitype.MultiTypeAdapter
 

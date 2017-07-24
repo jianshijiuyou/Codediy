@@ -14,6 +14,8 @@ import info.jiuyou.codediy.base.app.BaseActivity
 import info.jiuyou.codediy.fragment.NewsListFragment
 import info.jiuyou.codediy.fragment.SitesListFragment
 import info.jiuyou.codediy.fragment.TopicListFragment
+import info.jiuyou.codediy.fragment.base.BaseFragment
+import info.jiuyou.codediy.fragment.base.RefreshRecyclerFragment
 import info.jiuyou.codediy.utils.Config
 import info.jiuyou.codediy.utils.DataCache
 import kotlinx.android.synthetic.main.activity_main.*
@@ -32,6 +34,8 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
     private lateinit var mCache: DataCache
     private val mConfig = Config.instance()
     private var mCurrentPosition = 0
+    private val fragmentList = mutableListOf<BaseFragment>()
+
     override fun getLayoutId() = R.layout.activity_main
 
 
@@ -50,18 +54,14 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
         val fragment1 = TopicListFragment()
         val fragment2 = NewsListFragment()
         val fragment3 = SitesListFragment()
+        fragmentList.add(fragment1)
+        fragmentList.add(fragment2)
+        fragmentList.add(fragment3)
         viewPager.adapter = object : FragmentPagerAdapter(supportFragmentManager) {
             val titles = arrayOf("Topics", "News", "Sites")
-            override fun getItem(position: Int) = when (position) {
-                0 -> fragment1
-                1 -> fragment2
-                2 -> fragment3
-                else -> {
-                    throw NullPointerException("没有找到对应的fragment")
-                }
-            }
+            override fun getItem(position: Int) = fragmentList[position]
 
-            override fun getCount() = 3
+            override fun getCount() = fragmentList.size
 
             override fun getPageTitle(position: Int): CharSequence {
                 return titles[position]
@@ -128,7 +128,11 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
 
 
     fun quickToTop() {
-        toast("返回顶部")
+        when(mCurrentPosition){
+            0 ->{(fragmentList[0] as TopicListFragment).quickToTop()}
+            1 ->{(fragmentList[1] as NewsListFragment).quickToTop()}
+            2 ->{(fragmentList[2] as SitesListFragment).quickToTop()}
+        }
     }
 
 

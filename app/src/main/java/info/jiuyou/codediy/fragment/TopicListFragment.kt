@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView
 import com.gcssloop.diycode_sdk.api.topic.bean.Topic
 import com.gcssloop.diycode_sdk.api.topic.event.GetTopicsListEvent
 import info.jiuyou.codediy.fragment.base.RefreshRecyclerFragment
-import info.jiuyou.codediy.fragment.viewbinder.TopicViewBinder
+import info.jiuyou.codediy.viewbinder.TopicViewBinder
 import kotlinx.android.synthetic.main.fragment_main_base.*
 import me.drakeet.multitype.MultiTypeAdapter
 
