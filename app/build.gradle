@@ -41,7 +41,6 @@ dependencies {
     compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.2-alpha-8'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
-    compile 'com.zzhoujay.richtext:richtext:2.5.4'
 
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'

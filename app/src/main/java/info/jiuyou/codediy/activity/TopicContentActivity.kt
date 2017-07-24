@@ -11,6 +11,7 @@ import info.jiuyou.codediy.base.app.BaseActivity
 import info.jiuyou.codediy.utils.DataCache
 import info.jiuyou.codediy.viewbinder.MarkdownViewBinder
 import info.jiuyou.codediy.viewbinder.TopicViewBinder
+import info.jiuyou.codediy.widget.MarkdownView
 import kotlinx.android.synthetic.main.activity_topic_content.*
 import me.drakeet.multitype.MultiTypeAdapter
 import org.greenrobot.eventbus.EventBus
@@ -27,7 +28,7 @@ class TopicContentActivity : BaseActivity(), AnkoLogger {
     private lateinit var dataCache: DataCache
     private lateinit var adapter: MultiTypeAdapter
     private val requestType = mutableMapOf<String, String>()
-
+    private lateinit var markdownViewBinder:MarkdownViewBinder
 
     companion object {
         val REQUEST_TYPE_TOPIC_CONTENT = "REQUEST_TYPE_TOPIC_CONTENT"
@@ -47,7 +48,8 @@ class TopicContentActivity : BaseActivity(), AnkoLogger {
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = MultiTypeAdapter()
         adapter.register(Topic::class.java, TopicViewBinder(this, false))
-        adapter.register(String::class.java, MarkdownViewBinder(this))
+        markdownViewBinder=MarkdownViewBinder(this)
+        adapter.register(String::class.java, markdownViewBinder)
         adapter.addData(topic)
         recyclerView.adapter = adapter
         dataCache = DataCache(this)
@@ -88,6 +90,13 @@ class TopicContentActivity : BaseActivity(), AnkoLogger {
         super.onStop()
         EventBus.getDefault().unregister(this)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        markdownViewBinder.clearWebViewResource()
+    }
+
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.topic_menu, menu)
