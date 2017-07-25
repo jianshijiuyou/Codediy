@@ -16,20 +16,25 @@ import org.jetbrains.anko.toast
  * des ：
  */
 class CommentViewBinder(val ctx: Context, val block: (String) -> Unit) : ItemViewBinder<CommentViewBinder.Comment, BaseViewHolder>() {
+    private var etText: EditText? = null
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): BaseViewHolder {
         return BaseViewHolder(inflater.inflate(R.layout.item_reply_comment, parent, false))
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, item: CommentViewBinder.Comment) {
-        val etText = holder.getView<EditText>(R.id.et_text)
+        etText = holder.getView<EditText>(R.id.et_text)
         holder.getView<Button>(R.id.btn_comment).onClick {
-            val msg = etText.text.toString().trim()
+            val msg = etText?.text.toString().trim()
             if (msg.isBlank()) {
                 ctx.toast("请先填写评论内容")
                 return@onClick
             }
             block(msg)
         }
+    }
+
+    fun clear() {
+        etText?.setText("")
     }
 
     class Comment
