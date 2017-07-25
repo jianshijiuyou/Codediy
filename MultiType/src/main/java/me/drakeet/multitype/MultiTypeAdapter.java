@@ -185,7 +185,7 @@ public class MultiTypeAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     @NonNull
-    public List<?> getItems() {
+    public List<Object> getItems() {
         return items;
     }
 

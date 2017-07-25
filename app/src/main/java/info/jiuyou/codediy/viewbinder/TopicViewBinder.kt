@@ -40,7 +40,7 @@ class TopicViewBinder(val ctx: Context) : ItemViewBinder<Topic, TopicViewBinder.
 
         holder.apply {
             tvTitle.text = item.title
-            name.text = item.user.name
+            name.text = item.user.login
             if (isClick) {
                 note.text = item.node_name
             }else{

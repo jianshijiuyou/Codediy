@@ -3,15 +3,16 @@ package info.jiuyou.codediy.activity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import com.gcssloop.diycode_sdk.api.login.event.LoginEvent
 import com.gcssloop.diycode_sdk.api.topic.bean.Topic
-import com.gcssloop.diycode_sdk.api.topic.bean.TopicContent
+import com.gcssloop.diycode_sdk.api.topic.bean.TopicReply
+import com.gcssloop.diycode_sdk.api.topic.event.CreateTopicReplyEvent
 import com.gcssloop.diycode_sdk.api.topic.event.GetTopicEvent
+import com.gcssloop.diycode_sdk.api.topic.event.GetTopicRepliesListEvent
 import info.jiuyou.codediy.R
 import info.jiuyou.codediy.base.app.BaseActivity
 import info.jiuyou.codediy.utils.DataCache
-import info.jiuyou.codediy.viewbinder.MarkdownViewBinder
-import info.jiuyou.codediy.viewbinder.TopicViewBinder
-import info.jiuyou.codediy.widget.MarkdownView
+import info.jiuyou.codediy.viewbinder.*
 import kotlinx.android.synthetic.main.activity_topic_content.*
 import me.drakeet.multitype.MultiTypeAdapter
 import org.greenrobot.eventbus.EventBus
@@ -20,26 +21,28 @@ import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import org.jetbrains.anko.share
+import org.jetbrains.anko.toast
 
 class TopicContentActivity : BaseActivity(), AnkoLogger {
 
     private lateinit var topic: Topic
-    private var topicContent: TopicContent? = null
+    //private var topicContent: TopicContent? = null
     private lateinit var dataCache: DataCache
     private lateinit var adapter: MultiTypeAdapter
     private val requestType = mutableMapOf<String, String>()
-    private lateinit var markdownViewBinder:MarkdownViewBinder
+    private lateinit var markdownViewBinder: MarkdownViewBinder
 
-    companion object {
-        val REQUEST_TYPE_TOPIC_CONTENT = "REQUEST_TYPE_TOPIC_CONTENT"
-        val REQUEST_TYPE_REPLY = "REQUEST_TYPE_REPLY"
-    }
+//    companion object {
+//        val REQUEST_TYPE_TOPIC_CONTENT = "REQUEST_TYPE_TOPIC_CONTENT"
+//        val REQUEST_TYPE_REPLY = "REQUEST_TYPE_REPLY"
+//    }
 
 
     override fun getLayoutId() = R.layout.activity_topic_content
 
     override fun initData() {
         topic = intent.getSerializableExtra("topic") as Topic
+        EventBus.getDefault().register(this)
     }
 
 
@@ -48,8 +51,13 @@ class TopicContentActivity : BaseActivity(), AnkoLogger {
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = MultiTypeAdapter()
         adapter.register(Topic::class.java, TopicViewBinder(this, false))
-        markdownViewBinder=MarkdownViewBinder(this)
+        markdownViewBinder = MarkdownViewBinder(this)
         adapter.register(String::class.java, markdownViewBinder)
+        adapter.register(TopicReply::class.java, TopicReplyViewBinder(this))
+        adapter.register(CommentViewBinder.Comment::class.java, CommentViewBinder(this) {
+            mDiycode.createTopicReply(topic.id, it)
+        })
+        adapter.register(LoginViewBinder.Login::class.java, LoginViewBinder(this))
         adapter.addData(topic)
         recyclerView.adapter = adapter
         dataCache = DataCache(this)
@@ -57,45 +65,89 @@ class TopicContentActivity : BaseActivity(), AnkoLogger {
     }
 
     fun isRequestData() {
-        topicContent = dataCache.getTopicContent(topic.id)
+        val topicContent = dataCache.getTopicContent(topic.id)
         if (topicContent == null || topicContent?.updated_at != topic.updated_at) {
             //请求数据
-            val uuid = mDiycode.getTopic(topic.id)
-            requestType.put(uuid, REQUEST_TYPE_TOPIC_CONTENT)
+            mDiycode.getTopic(topic.id)
+
         } else {
-            info("使用的缓存数据")
+            info("使用的缓存内容")
             adapter.addData(topicContent?.body)
-        }
-    }
-
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onResponse(event: GetTopicEvent) {
-        when (requestType[event.uuid]) {
-            REQUEST_TYPE_TOPIC_CONTENT -> {
-                topicContent = event.bean
-                adapter.addData(topicContent?.body)
-                dataCache.saveTopicContent(topicContent)
+            val replyList = dataCache.getTopicRepliesList(topic.id)
+            if (replyList == null || replyList.size != topicContent?.replies_count) {
+                mDiycode.getTopicRepliesList(topic.id, 0, topicContent.replies_count)
+            } else {
+                info("使用的缓存回复")
+                adapter.addDatas(replyList as List<Any>)
+                //评论
+                comment()
             }
         }
     }
 
 
-    override fun onStart() {
-        super.onStart()
-        EventBus.getDefault().register(this)
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onTopicContentResponse(event: GetTopicEvent) {
+        if (event.isOk) {
+            val topicContent = event.bean
+            adapter.addData(topicContent?.body)
+            dataCache.saveTopicContent(topicContent)
+            mDiycode.getTopicRepliesList(topic.id, 0, topicContent.replies_count)
+        } else {
+            toast("请求失败:${event.codeDescribe}")
+        }
+
     }
 
-    override fun onStop() {
-        super.onStop()
-        EventBus.getDefault().unregister(this)
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onRelpyListResPonse(event: GetTopicRepliesListEvent) {
+        if (event.isOk) {
+            val replyList = event.bean
+            adapter.addDatas(replyList as List<Any>)
+            dataCache.saveTopicRepliesList(topic.id, replyList)
+
+            //评论
+            comment()
+        } else {
+            toast("请求失败:${event.codeDescribe}")
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onLoginResponse(event: LoginEvent) {
+        if (event.isOk) {
+            toast("已经登录了")
+            adapter.items.removeAt(adapter.items.size - 1)
+            adapter.items.add(CommentViewBinder.Comment())
+            adapter.notifyItemChanged(adapter.items.size - 1)
+        }
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onCreateReply(event: CreateTopicReplyEvent) {
+        if (event.isOk) {
+            // TODO 没有搞完
+            mDiycode.getTopicRepliesList(topic.id, 0, topic.replies_count+1)
+        }else{
+            toast("回复失败")
+        }
+    }
+
+
+    fun comment() {
+        if (mDiycode.isLogin) {
+            adapter.addData(CommentViewBinder.Comment())
+        } else {
+            adapter.addData(LoginViewBinder.Login())
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         markdownViewBinder.clearWebViewResource()
+        EventBus.getDefault().unregister(this)
     }
-
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

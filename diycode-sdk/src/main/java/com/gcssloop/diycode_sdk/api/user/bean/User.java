@@ -22,12 +22,14 @@
 
 package com.gcssloop.diycode_sdk.api.user.bean;
 
+import android.text.TextUtils;
+
 import java.io.Serializable;
 
 /**
  * 用户信息
  */
-public class User implements Serializable{
+public class User implements Serializable {
     private int id;             // 唯一 id
     private String login;       // 登录用户名
     private String name;        // 昵称
@@ -54,7 +56,7 @@ public class User implements Serializable{
     }
 
     public String getName() {
-        return this.name;
+        return TextUtils.isEmpty(this.name) ? login : name;
     }
 
     public void setAvatar_url(String avatar_url) {

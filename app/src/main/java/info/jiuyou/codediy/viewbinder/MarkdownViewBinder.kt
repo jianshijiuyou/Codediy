@@ -16,15 +16,12 @@ import me.drakeet.multitype.ItemViewBinder
  * des ：
  */
 class MarkdownViewBinder(val ctx: Context) : ItemViewBinder<String, BaseViewHolder>() {
-    private  var mMarkdownView: MarkdownView?=null
+    private var mMarkdownView: MarkdownView? = null
+    private var isFirst = true
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): BaseViewHolder {
-        return BaseViewHolder(inflater.inflate(R.layout.item_markdown, parent, false))
-    }
-
-    override fun onBindViewHolder(holder: BaseViewHolder, item: String) {
+        val holder = BaseViewHolder(inflater.inflate(R.layout.item_markdown, parent, false))
         val content = holder.getView<FrameLayout>(R.id.content)
         //1
-
         mMarkdownView = MarkdownView(ctx)
         mMarkdownView?.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -33,8 +30,16 @@ class MarkdownViewBinder(val ctx: Context) : ItemViewBinder<String, BaseViewHold
         mMarkdownView?.addJavascriptInterface(listener, "listener")
         val mWebViewClient = GcsMarkdownViewClient(ctx)
         mMarkdownView?.setWebViewClient(mWebViewClient)
+        return holder
+    }
+
+    override fun onBindViewHolder(holder: BaseViewHolder, item: String) {
         //2
-        mMarkdownView?.setMarkDownText(item)
+        if (isFirst) {
+            mMarkdownView?.setMarkDownText(item)
+            isFirst = false
+        }
+
     }
 
     // 防止 WebView 引起的内存泄漏

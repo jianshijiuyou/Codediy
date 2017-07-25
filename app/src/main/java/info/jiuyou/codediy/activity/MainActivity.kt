@@ -1,5 +1,6 @@
 package info.jiuyou.codediy.activity
 
+import android.graphics.Bitmap
 import android.support.design.widget.NavigationView
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.GravityCompat
@@ -9,13 +10,19 @@ import android.view.GestureDetector
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
+import android.widget.ImageView
+import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.animation.GlideAnimation
+import com.bumptech.glide.request.target.SimpleTarget
+import com.gcssloop.diycode_sdk.api.login.event.LogoutEvent
+import com.gcssloop.diycode_sdk.api.user.event.GetMeEvent
 import info.jiuyou.codediy.R
 import info.jiuyou.codediy.base.app.BaseActivity
 import info.jiuyou.codediy.fragment.NewsListFragment
 import info.jiuyou.codediy.fragment.SitesListFragment
 import info.jiuyou.codediy.fragment.TopicListFragment
 import info.jiuyou.codediy.fragment.base.BaseFragment
-import info.jiuyou.codediy.fragment.base.RefreshRecyclerFragment
 import info.jiuyou.codediy.utils.Config
 import info.jiuyou.codediy.utils.DataCache
 import kotlinx.android.synthetic.main.activity_main.*
@@ -24,7 +31,9 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.find
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
 
 
@@ -37,7 +46,9 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
     private val fragmentList = mutableListOf<BaseFragment>()
 
     override fun getLayoutId() = R.layout.activity_main
-
+//    override fun initData() {
+//        mDiycode.logout()
+//    }
 
     override fun initViews() {
         EventBus.getDefault().register(this)
@@ -123,22 +134,59 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
     }
 
     fun loadMenuData() {
+        val imgAvatar = navigation.getHeaderView(0).find<ImageView>(R.id.imgAvatar)
+        val tvUserName = navigation.getHeaderView(0).find<TextView>(R.id.tvUserName)
+        if (mDiycode.isLogin) {
+            val me = mCache.me
+            if (me != null) {
+                Glide.with(this).load(me.avatar_url).into(imgAvatar)
+                tvUserName.text = me.login
+                imgAvatar.onClick {
+                    toast("用户信息")
+                }
+                return
+            } else {
+                mDiycode.me
+            }
+        } else {
+            mCache.removeMe()
+            imgAvatar.setImageResource(R.mipmap.ic_launcher)
+            tvUserName.text = "点击头像登录"
+            imgAvatar.onClick {
+                startActivity<LoginActivity>()
+            }
+        }
 
     }
 
 
     fun quickToTop() {
-        when(mCurrentPosition){
-            0 ->{(fragmentList[0] as TopicListFragment).quickToTop()}
-            1 ->{(fragmentList[1] as NewsListFragment).quickToTop()}
-            2 ->{(fragmentList[2] as SitesListFragment).quickToTop()}
+        when (mCurrentPosition) {
+            0 -> {
+                (fragmentList[0] as TopicListFragment).quickToTop()
+            }
+            1 -> {
+                (fragmentList[1] as NewsListFragment).quickToTop()
+            }
+            2 -> {
+                (fragmentList[2] as SitesListFragment).quickToTop()
+            }
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onLoginResponse(event: GetMeEvent) {
+        if (event.isOk) {
+            mCache.saveMe(event.bean)
+            loadMenuData()
+        }
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onTest(s: String) {
-
+    fun onLoginOutResponse(event: LogoutEvent) {
+        if (event.isOk) {
+            loadMenuData()
+        }
     }
 
 

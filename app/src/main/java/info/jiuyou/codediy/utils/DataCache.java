@@ -81,21 +81,21 @@ public class DataCache {
 
     public void saveTopicContent(TopicContent content) {
         saveData("topic_content_" + content.getId(), content);
-        String preview = HtmlUtil.Html2Text(content.getBody_html());
-        if (preview.length() > 100) {
-            preview = preview.substring(0, 100);
-        }
-        saveData("topic_content_preview" + content.getId(), preview);
+//        String preview = HtmlUtil.Html2Text(content.getBody_html());
+//        if (preview.length() > 100) {
+//            preview = preview.substring(0, 100);
+//        }
+//        saveData("topic_content_preview" + content.getId(), preview);
     }
 
     public TopicContent getTopicContent(int id) {
         return getData("topic_content_" + id);
     }
 
-    public String getTopicPreview(int id) {
-        String key = "topic_content_preview" + id;
-        return getData(key);
-    }
+//    public String getTopicPreview(int id) {
+//        String key = "topic_content_preview" + id;
+//        return getData(key);
+//    }
 
     public void saveTopicRepliesList(int topic_id, List<TopicReply> replyList) {
         ArrayList<TopicReply> replies = new ArrayList<>(replyList);
