@@ -8,6 +8,7 @@ import android.view.MenuItem
 import com.gcssloop.diycode_sdk.api.Diycode
 import info.jiuyou.codediy.R
 import info.jiuyou.codediy.hcakpatch.IMMLeaks
+import org.jetbrains.anko.find
 
 /**
  * author ：jianshijiuyou@gmail.com
@@ -16,13 +17,13 @@ import info.jiuyou.codediy.hcakpatch.IMMLeaks
  */
 abstract class BaseActivity : AppCompatActivity() {
     protected lateinit var mDiycode: Diycode
-    protected lateinit var viewHolder: ViewHolder
+    //protected lateinit var viewHolder: ViewHolder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mDiycode = Diycode.getSingleInstance()
-        viewHolder = ViewHolder(layoutInflater, null, getLayoutId())
-        setContentView(viewHolder.rootView)
+        //viewHolder = ViewHolder(layoutInflater, null, getLayoutId())
+        setContentView(getLayoutId())
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             IMMLeaks.fixFocusedViewLeak(this.application)// 修复 InputMethodManager 引发的内存泄漏
         }
@@ -37,12 +38,14 @@ abstract class BaseActivity : AppCompatActivity() {
 
 
     fun initActionBar() {
-        val toolbar = viewHolder[R.id.toolbar]
-        if (toolbar != null) {
-            setSupportActionBar(toolbar as Toolbar)
+        try {
+            val toolbar = find<Toolbar>(R.id.toolbar)
+            if (toolbar != null) {
+                setSupportActionBar(toolbar)
+            }
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        } catch (e: Exception) {
         }
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

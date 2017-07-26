@@ -8,11 +8,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.gcssloop.diycode_sdk.api.news.bean.New
 import info.jiuyou.codediy.R
+import info.jiuyou.codediy.activity.UserActivity
 import info.jiuyou.codediy.utils.CustomTabsHelper
 import info.jiuyou.codediy.utils.ImageUtils
 import info.jiuyou.codediy.utils.TimeUtil
 import me.drakeet.multitype.ItemViewBinder
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
 
 /**
@@ -34,10 +36,10 @@ class NewsViewBinder(val ctx: Context) : ItemViewBinder<New, BaseViewHolder>() {
         holder.getView<TextView>(R.id.tv_subtitle).text = item.address
 
         holder.getView<TextView>(R.id.tv_name).onClick {
-            ctx.toast(item.user.name)
+            ctx.startActivity<UserActivity>("user" to item.user)
         }
         holder.getView<ImageView>(R.id.img_head).onClick {
-            ctx.toast(item.user.name)
+            ctx.startActivity<UserActivity>("user" to item.user)
         }
         holder.getView<View>(R.id.item).onClick {
             CustomTabsHelper.openUrl(ctx,item.address)

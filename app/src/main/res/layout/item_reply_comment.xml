@@ -2,6 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:background="@color/app_bg"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:layout_marginTop="10dp"
     android:padding="10dp"
     android:layout_height="wrap_content">

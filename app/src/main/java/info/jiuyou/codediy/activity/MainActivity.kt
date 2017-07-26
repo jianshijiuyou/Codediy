@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.animation.GlideAnimation
 import com.bumptech.glide.request.target.SimpleTarget
 import com.gcssloop.diycode_sdk.api.login.event.LogoutEvent
+import com.gcssloop.diycode_sdk.api.user.bean.User
 import com.gcssloop.diycode_sdk.api.user.event.GetMeEvent
 import info.jiuyou.codediy.R
 import info.jiuyou.codediy.base.app.BaseActivity
@@ -142,7 +143,13 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
                 Glide.with(this).load(me.avatar_url).into(imgAvatar)
                 tvUserName.text = me.login
                 imgAvatar.onClick {
-                    toast("用户信息")
+
+                    startActivity<UserActivity>("user" to User().apply {
+                        id=me.id
+                        login=me.login
+                        name=me.name
+                        avatar_url=me.avatar_url
+                    })
                 }
                 return
             } else {

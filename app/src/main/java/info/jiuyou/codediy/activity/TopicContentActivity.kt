@@ -51,7 +51,7 @@ class TopicContentActivity : BaseActivity(), AnkoLogger {
         title = "话题"
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = MultiTypeAdapter()
-        adapter.register(Topic::class.java, TopicViewBinder(this, false))
+        adapter.register(Topic::class.java, TopicViewBinder(this, false,false))
         markdownViewBinder = MarkdownViewBinder(this)
         adapter.register(String::class.java, markdownViewBinder)
         adapter.register(TopicReply::class.java, TopicReplyViewBinder(this))

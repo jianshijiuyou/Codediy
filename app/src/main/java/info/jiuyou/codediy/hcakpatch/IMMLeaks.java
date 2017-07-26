@@ -72,6 +72,9 @@ public class IMMLeaks {
       try {
         Object lock = mHField.get(inputMethodManager);
         // This is highly dependent on the InputMethodManager implementation.
+        if(lock==null){
+          return;
+        }
         synchronized (lock) {
           View servedView = (View) mServedViewField.get(inputMethodManager);
           if (servedView != null) {

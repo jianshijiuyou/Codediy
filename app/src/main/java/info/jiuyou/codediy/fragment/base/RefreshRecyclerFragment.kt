@@ -9,7 +9,7 @@ import me.drakeet.multitype.MultiTypeAdapter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.toast
 
 
 /**
@@ -119,10 +119,10 @@ abstract class RefreshRecyclerFragment<T, Event : BaseEvent<List<T>>> : BaseFrag
     protected open fun onError(event: Event, type: String) {
         when (type) {
             POST_TYPE_REFRESH -> {
-                toast("刷新数据失败")
+                context.toast("刷新数据失败")
             }
             POST_TYPE_LOADMORE -> {
-                toast("加载数据失败")
+                context.toast("加载数据失败")
             }
         }
     }
