@@ -76,10 +76,10 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
-    <ImageView
+    <android.support.design.widget.MyFloatingActionButton
         android:id="@+id/imgAvatar"
-        android:layout_height="80dp"
-        android:layout_width="80dp"
+        android:layout_height="120dp"
+        android:layout_width="120dp"
         android:layout_margin="16dp"
         android:src="@mipmap/ic_launcher"
         app:layout_anchor="@id/main.appbar"
