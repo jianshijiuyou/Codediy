@@ -3,7 +3,7 @@
 
 编写本项目的初衷在于学习 kotlin 语言，学习大牛的设计思想，编码风格。以及本人对 coding 的热爱。
 
-应用下载 [app-debug.apk](appdata/app-debug.apk)
+应用下载 [app-debug.apk](http://os6ycxx7w.bkt.clouddn.com/github/app-debug.apk)
 # 应用截图
 ![](appdata/screenshot.gif)
 ## License
