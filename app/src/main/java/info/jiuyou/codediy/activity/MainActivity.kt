@@ -1,22 +1,19 @@
 package info.jiuyou.codediy.activity
 
-import android.graphics.Bitmap
 import android.support.design.widget.NavigationView
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.view.GestureDetector
-import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.animation.GlideAnimation
-import com.bumptech.glide.request.target.SimpleTarget
 import com.gcssloop.diycode_sdk.api.login.event.LogoutEvent
 import com.gcssloop.diycode_sdk.api.user.bean.User
+import com.gcssloop.diycode_sdk.api.user.bean.UserDetail
 import com.gcssloop.diycode_sdk.api.user.event.GetMeEvent
 import info.jiuyou.codediy.R
 import info.jiuyou.codediy.base.app.BaseActivity
@@ -28,14 +25,14 @@ import info.jiuyou.codediy.utils.Config
 import info.jiuyou.codediy.utils.DataCache
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_main.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.find
+import org.jetbrains.anko.*
+import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.toast
 
 
 class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItemSelectedListener {
@@ -145,22 +142,29 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
                 imgAvatar.onClick {
 
                     startActivity<UserActivity>("user" to User().apply {
-                        id=me.id
-                        login=me.login
-                        name=me.name
-                        avatar_url=me.avatar_url
+                        id = me.id
+                        login = me.login
+                        name = me.name
+                        avatar_url = me.avatar_url
                     })
                 }
-                return
+
+                if(navigation.menu.findItem(R.id.nav_menu_logout)==null){
+                    navigation.menu.add(R.id.g2,R.id.nav_menu_logout,1,"退出登录").setIcon(R.drawable.ic_logout)
+                }
             } else {
                 mDiycode.me
             }
+
         } else {
             mCache.removeMe()
             imgAvatar.setImageResource(R.mipmap.ic_launcher)
             tvUserName.text = "点击头像登录"
             imgAvatar.onClick {
                 startActivity<LoginActivity>()
+            }
+            if(navigation.menu.findItem(R.id.nav_menu_logout)!=null){
+                navigation.menu.removeItem(R.id.nav_menu_logout)
             }
         }
 
@@ -196,49 +200,67 @@ class MainActivity : BaseActivity(), AnkoLogger, NavigationView.OnNavigationItem
         }
     }
 
+    suspend fun getMeNow(): UserDetail {
+        val me = mCache.me
+        if (me == null) {
+            return mDiycode.meNow
+        } else {
+            return me
+        }
+    }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
             R.id.nav_menu_post -> {
-                toast("nav_menu_post")
+                if (mDiycode.isLogin) {
+                    async(UI) {
+                        val dialog = indeterminateProgressDialog(message = "正在加载…")
+                        val me = getMeNow()
+                        dialog.dismiss()
+                        startActivity<UserActivity>("user" to User().apply {
+                            id = me.id
+                            login = me.login
+                            name = me.name
+                            avatar_url = me.avatar_url
+                        })
+                    }
+                } else {
+                    startActivity<LoginActivity>()
+                }
             }
             R.id.nav_menu_collect -> {
-                toast("nav_menu_collect")
-            }
-            R.id.nav_menu_setting -> {
-                toast("nav_menu_setting")
+                if (mDiycode.isLogin) {
+                    async(UI) {
+                        val dialog = indeterminateProgressDialog(message = "正在加载…")
+                        val me = getMeNow()
+                        dialog.dismiss()
+                        startActivity<MyCollectActivity>("loginName" to me.login)
+                    }
+                } else {
+                    startActivity<LoginActivity>()
+                }
             }
             R.id.nav_menu_about -> {
-                toast("nav_menu_about")
+                startActivity<AboutActivity>()
+            }
+            R.id.nav_menu_logout -> {
+                alert(Appcompat, "确定要退出登录吗？", "提示") {
+                    positiveButton("退出登录") {
+                        mDiycode.logout()
+                        loadMenuData()
+                    }
+                    negativeButton("暂不退出") {
+
+                    }
+                }.show()
+
             }
         }
 
         return true
     }
 
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            R.id.action_notification -> {
-                toast("通知")
-                return true
-            }
-            R.id.action_settings -> {
-                toast("设置")
-                return true
-            }
-            else -> {
-                return super.onOptionsItemSelected(item)
-            }
-        }
-
-    }
 
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {

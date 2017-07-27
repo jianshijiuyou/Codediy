@@ -1,11 +1,14 @@
 package info.jiuyou.codediy.base.app
 
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import com.gcssloop.diycode_sdk.api.Diycode
+import com.yanzhenjie.permission.AndPermission
+import com.yanzhenjie.permission.PermissionListener
 import info.jiuyou.codediy.R
 import info.jiuyou.codediy.hcakpatch.IMMLeaks
 import org.jetbrains.anko.find
@@ -27,7 +30,16 @@ abstract class BaseActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             IMMLeaks.fixFocusedViewLeak(this.application)// 修复 InputMethodManager 引发的内存泄漏
         }
-
+        // 申请权限。
+        AndPermission.with(this)
+                .requestCode(100)
+                .permission(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+                .rationale { _, rationale -> AndPermission.rationaleDialog(this, rationale).show() }
+                .callback(listener)
+                .start()
         initActionBar()
         initData()
         initViews()
@@ -60,4 +72,19 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected open fun initData() {}
     abstract fun initViews()
+
+    private val listener = object : PermissionListener {
+        override fun onSucceed(requestCode: Int, grantedPermissions: List<String>) {
+
+        }
+
+        override fun onFailed(requestCode: Int, deniedPermissions: List<String>) {
+
+            if (AndPermission.hasAlwaysDeniedPermission(this@BaseActivity, deniedPermissions)) {
+
+                AndPermission.defaultSettingDialog(this@BaseActivity, 123).show()
+
+            }
+        }
+    }
 }

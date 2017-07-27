@@ -1,1 +1,1 @@
-include ':app', 'diycode-sdk', ':MultiType'
+include ':app', 'diycode-sdk', ':MultiType', ':about-page'
